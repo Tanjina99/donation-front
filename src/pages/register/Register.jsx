@@ -4,12 +4,14 @@ import { toast } from "sonner";
 import Lottie from "lottie-react";
 import register from "../../../public/register.json";
 import { useNavigate } from "react-router";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
 const Register = () => {
   const [fullName, setFullName] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
   const navigate = useNavigate();
 
   const onFinish = async (e) => {
@@ -108,12 +110,12 @@ const Register = () => {
               />
             </div>
 
-            <div className="form-control">
+            <div className="form-control mb-3 relative">
               <label className="block text-black text-sm font-semibold mb-2">
-                Password
+                <span className="label-text text-black">Password</span>
               </label>
               <input
-                type="password"
+                type={isVisible ? "text" : "password"}
                 placeholder="Password"
                 className="input input-bordered w-full p-3 bg-white border border-gray-300 rounded-md text-black"
                 value={password}
@@ -121,6 +123,17 @@ const Register = () => {
                 required
                 name="password"
               />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-2 flex items-center mt-5"
+                onClick={() => setIsVisible(!isVisible)}
+              >
+                {isVisible ? (
+                  <FaRegEyeSlash className="text-gray-500" />
+                ) : (
+                  <FaRegEye className="text-gray-500" />
+                )}
+              </button>
             </div>
 
             <div className="form-control mt-4">

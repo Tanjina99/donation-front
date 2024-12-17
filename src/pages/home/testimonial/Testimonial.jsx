@@ -2,8 +2,9 @@ import React from "react";
 import { FaQuoteLeft } from "react-icons/fa";
 import { testimonial } from "../../../staticData/Testimonial";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
+import { Navigation, Autoplay } from "swiper/modules";
 import "swiper/css";
+import "swiper/css/navigation";
 
 const Testimonial = () => {
   return (
@@ -14,9 +15,15 @@ const Testimonial = () => {
         </h2>
 
         <Swiper
-          modules={[Navigation]}
+          modules={[Navigation, Autoplay]}
           spaceBetween={30}
           slidesPerView={1}
+          navigation={true}
+          autoplay={{
+            delay: 5000,
+            disableOnInteraction: false,
+          }}
+          loop={true}
           breakpoints={{
             640: {
               slidesPerView: 2,
@@ -24,10 +31,6 @@ const Testimonial = () => {
             1024: {
               slidesPerView: 3,
             },
-          }}
-          loop={true}
-          autoplay={{
-            delay: 5000,
           }}
         >
           {testimonial.map((testimonials) => (

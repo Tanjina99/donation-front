@@ -9,27 +9,35 @@ const Fundraising = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("default");
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
   const campaignsPerPage = 6;
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/api/fundraiser")
-      .then((response) => {
+    const fetchCampaigns = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/fundraiser"
+        );
         const campaignData = response.data.data;
         if (Array.isArray(campaignData)) {
           setCampaigns(campaignData);
           setFilteredCampaigns(campaignData);
         } else {
-          console.error("All CampaignData", campaignData);
+          console.error("Invalid CampaignData", campaignData);
           setCampaigns([]);
           setFilteredCampaigns([]);
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching data:", error);
         setCampaigns([]);
         setFilteredCampaigns([]);
-      });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCampaigns();
   }, []);
 
   const handleSearch = (e) => {
@@ -44,7 +52,7 @@ const Fundraising = () => {
     setSortOrder(order);
     const sortedCampaigns = [...filteredCampaigns].sort((a, b) => {
       if (order === "asc") return a.targetedAmount - b.targetedAmount; // Ascending order from lowest to highest
-      if (order === "desc") return b.targetedAmount - a.targetedAmount; // Descending order from Highest to lowest
+      if (order === "desc") return b.targetedAmount - a.targetedAmount; // Descending order from highest to lowest
       return 0;
     });
     setFilteredCampaigns(sortedCampaigns);
@@ -93,60 +101,67 @@ const Fundraising = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-items-center">
-        {currentCampaigns.map((campaign) => (
-          <div
-            key={campaign._id}
-            className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col w-80 h-85"
-          >
-            <img
-              src={campaign.thumbnail}
-              alt={campaign.title}
-              className="w-full h-40 object-cover"
-            />
-            <div className="p-4 flex-grow">
-              <h2 className="text-lg font-bold mb-2 text-black">
-                {campaign.title}
-              </h2>
-              <p className="text-sm text-gray-600 mb-4">
-                {campaign.description}
-              </p>
+      {loading ? (
+        <div className="flex justify-center">
+          <span className="loading loading-ring loading-md"></span>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-items-center">
+          {campaigns.map((campaign) => (
+            <div
+              key={campaign._id}
+              className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col w-80 h-85"
+            >
+              <img
+                src={campaign.thumbnail}
+                alt={campaign.title}
+                className="w-full h-40 object-cover"
+              />
+              <div className="p-4 flex-grow">
+                <h2 className="text-lg font-bold mb-2 text-black">
+                  {campaign.title}
+                </h2>
+                <p className="text-sm text-gray-600 mb-4">
+                  {campaign.description}
+                </p>
 
-              <div className="mb-4">
-                <div className="text-gray-700">
-                  <span className="font-bold">Goal:</span> $
-                  {campaign.targetedAmount}
+                <div className="mb-4">
+                  <div className="text-gray-700">
+                    <span className="font-bold">Goal:</span> $
+                    {campaign.targetedAmount}
+                  </div>
+                  <div className="text-gray-700">
+                    <span className="font-bold">Raised:</span> $
+                    {campaign.raisedAmount}
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                    <div
+                      className="bg-green-500 h-2.5 rounded-full"
+                      style={{
+                        width: `${
+                          (campaign.raisedAmount / campaign.targetedAmount) *
+                          100
+                        }%`,
+                      }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="text-gray-700">
-                  <span className="font-bold">Raised:</span> $
-                  {campaign.raisedAmount}
+                <p className="text-sm text-gray-600">
+                  {campaign.daysLeft} days left
+                </p>
+                <div className="card-actions flex justify-center mb-2 mt-2">
+                  <Link to={`/single-fundraise/${campaign._id}`}>
+                    <button className="btn btn-outline btn-success flex items-center space-x-0">
+                      <span>Donate Now</span>
+                      <FcDonate className="text-2xl" />
+                    </button>
+                  </Link>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                  <div
-                    className=" bg-green-500 h-2.5 rounded-full"
-                    style={{
-                      width: `${
-                        (campaign.raisedAmount / campaign.targetedAmount) * 100
-                      }%`,
-                    }}
-                  ></div>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600">
-                {campaign.daysLeft} days left
-              </p>
-              <div className="card-actions flex justify-center mb-2 mt-2">
-                <Link to="/donation">
-                  <button className="btn btn-outline btn-success flex items-center space-x-0">
-                    <span>Donate Now</span>
-                    <FcDonate className="text-2xl" />
-                  </button>
-                </Link>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FcDonate } from "react-icons/fc";
-// import AuthProvider from "../../utils/authProvider/AuthProvider";
 import { Link } from "react-router";
 
 const Donation = () => {
@@ -11,17 +10,13 @@ const Donation = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const [loading, setLoading] = useState(true);
 
-  // const { user } = AuthProvider();
-  // console.log("User from donation", user);
-
   useEffect(() => {
     const fetchDonations = async () => {
       try {
+        setLoading(true);
         const response = await axios.get("http://localhost:5000/api/donations");
         console.log(response.data);
-
         const donationsData = response.data.data;
-
         setDonations(donationsData);
         setFilteredDonations(donationsData);
         setLoading(false);
@@ -34,32 +29,32 @@ const Donation = () => {
     fetchDonations();
   }, []);
 
-  // console.log(donations)
-
   useEffect(() => {
-    let result = donations.filter(
-      (donation) =>
-        donation.title.toLowerCase().includes(searchTerm.toLowerCase()) // add tolowercase for case sensitiveness
+    let result = donations.filter((donation) =>
+      donation.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     if (sortOrder === "asc") {
-      result = result.sort((a, b) => a.amount - b.amount); // Ascending order (lowest to highest)
+      result = result.sort((a, b) => a.amount - b.amount);
     } else {
-      result = result.sort((a, b) => b.amount - a.amount); // Descending order (highest to lowest)
+      result = result.sort((a, b) => b.amount - a.amount);
     }
 
     setFilteredDonations(result);
   }, [searchTerm, sortOrder, donations]);
 
   if (loading) {
-    return <div className="text-center p-6">Loading donations...</div>;
+    return (
+      <div className="text-center p-6">
+        Loading donations...
+        <span className="loading loading-ring loading-md"></span>
+      </div>
+    );
   }
 
   return (
     <div className="container mx-auto px-4 py-8 bg-white">
-      {" "}
       <div className="max-w-screen-xl mx-auto text-center px-4">
-        {" "}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800">
             Explore Our All Donations
@@ -102,7 +97,6 @@ const Donation = () => {
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-2 flex-1">
-                  {" "}
                   <h3 className="text-xl font-semibold text-gray-800">
                     {donation.title}
                   </h3>
@@ -119,7 +113,7 @@ const Donation = () => {
                   </div>
                 </div>
                 <div className="card-actions flex justify-center mb-4">
-                  <Link to="/donation">
+                  <Link to={`/single-donation/${donation._id}`}>
                     <button className="btn btn-outline btn-success flex items-center space-x-0">
                       <span>Donate Now ${donation.donationAmount}</span>
                       <FcDonate className="text-2xl" />

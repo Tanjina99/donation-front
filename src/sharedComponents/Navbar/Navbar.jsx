@@ -1,19 +1,20 @@
-import React from "react";
-import { AuthContext } from "../../utils/authProvider/AuthProvider";
 import { Link, NavLink, useNavigate } from "react-router";
+import AuthProvider from "../../utils/authProvider/AuthProvider";
+import Cookies from "js-cookie";
 
 const Navbar = () => {
-  const { user, logout } = React.useContext(AuthContext);
+  const { user, setUser } = AuthProvider();
   const navigate = useNavigate();
-  console.log("user", user);
+  // console.log("user", user);
 
   const handleLogout = () => {
-    logout();
+    Cookies.remove("accessToken");
+    setUser(null);
     navigate("/");
   };
 
   return (
-    <div className="navbar bg-base-100">
+    <div className="navbar bg-green-300">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -65,7 +66,7 @@ const Navbar = () => {
             <NavLink
               to="/"
               className={({ isActive }) =>
-                isActive ? "text-red-500" : "text-white"
+                isActive ? "text-red-500" : "text-black"
               }
             >
               Home
@@ -75,7 +76,7 @@ const Navbar = () => {
             <NavLink
               to="/donation"
               className={({ isActive }) =>
-                isActive ? "text-red-500" : "text-white"
+                isActive ? "text-red-500" : "text-black"
               }
             >
               Donation
@@ -85,7 +86,7 @@ const Navbar = () => {
             <NavLink
               to="/fundraising"
               className={({ isActive }) =>
-                isActive ? "text-red-500" : "text-white"
+                isActive ? "text-red-500" : "text-black"
               }
             >
               FundRaising
@@ -95,7 +96,7 @@ const Navbar = () => {
             <NavLink
               to="/about-us"
               className={({ isActive }) =>
-                isActive ? "text-red-500" : "text-white"
+                isActive ? "text-red-500" : "text-black"
               }
             >
               AboutUs
@@ -105,24 +106,12 @@ const Navbar = () => {
             <NavLink
               to="/contact-us"
               className={({ isActive }) =>
-                isActive ? "text-red-500" : "text-white"
+                isActive ? "text-red-500" : "text-black"
               }
             >
               ContactUs
             </NavLink>
           </li>
-          {user && user.role === "admin" && (
-            <li>
-              <NavLink
-                to="/admin"
-                className={({ isActive }) =>
-                  isActive ? "text-red-500" : "text-white"
-                }
-              >
-                Admin
-              </NavLink>
-            </li>
-          )}
         </ul>
       </div>
       <div className="navbar-end">
@@ -146,10 +135,24 @@ const Navbar = () => {
                 <a className="hover:text-green-500">{user.fullName}</a>
               </li>
               <li>
+                <Link
+                  to={`/user-transactions/${user?.id}`}
+                  className="hover:text-green-500"
+                >
+                  My Transactions
+                </Link>
+              </li>
+
+              <li>
                 <a href="/profile" className="hover:text-green-500">
                   My Profile
                 </a>
               </li>
+              {user && user.role === "admin" && (
+                <li>
+                  <Link to="/admin">Admin DashBoard</Link>
+                </li>
+              )}
               <li>
                 <button
                   className="btn btn-error btn-sm text-white"

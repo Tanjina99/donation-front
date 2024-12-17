@@ -4,10 +4,12 @@ import login from "../../../public/login.json";
 import axios from "axios";
 import { toast } from "sonner";
 import { useNavigate } from "react-router";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
   const navigate = useNavigate();
 
   const onFinish = async (e) => {
@@ -27,13 +29,10 @@ const Login = () => {
         user,
         { withCredentials: true }
       );
-
-      console.log("Response", response);
       toast.success("Login successful!");
       navigate("/");
     } catch (error) {
-      console.error("Error:", error);
-      toast.error("Invalid login credentials or server error");
+      toast.error("Invalid login credentials or server error", error);
     }
   };
 
@@ -72,19 +71,30 @@ const Login = () => {
                 name="email"
               />
             </div>
-            <div className="form-control mb-3">
+            <div className="form-control mb-3 relative">
               <label className="label">
                 <span className="label-text text-black">Password</span>
               </label>
               <input
-                type="password"
+                type={isVisible ? "text" : "password"}
                 placeholder="password"
-                className="input input-bordered input-md bg-white"
+                className="input input-bordered input-md bg-white w-full pr-10"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 name="password"
               />
+              <button
+                type="button"
+                className="absolute inset-y-0 right-2 flex items-center"
+                onClick={() => setIsVisible(!isVisible)}
+              >
+                {isVisible ? (
+                  <FaRegEyeSlash className="text-gray-500" />
+                ) : (
+                  <FaRegEye className="text-gray-500" />
+                )}
+              </button>
               <label className="label">
                 <a
                   href="#"
